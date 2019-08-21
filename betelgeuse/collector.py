@@ -6,6 +6,7 @@ import fnmatch
 import os
 
 from betelgeuse.parser import parse_docstring
+from betelgeuse.source_generator import gen_source
 
 
 class TestFunction(object):
@@ -63,6 +64,20 @@ class TestFunction(object):
         #: docstring and finally the ``__init__.py`` docstring if present. The
         #: first value found the search will stop.
         self.fields = {}
+        #: The list of decorators applied to this testcase
+        self.decorators = [
+            gen_source(decorator)
+            for decorator in self.function_def.decorator_list
+        ]
+        #: The list of decorators applied to this testcase's parent class. If
+        #: this testcase doesn'node have a parent class, then it will be
+        #: ``None``
+        self.class_decorators = None
+        if self.parent_class_def:
+            self.class_decorators = [
+                gen_source(decorator)
+                for decorator in self.parent_class_def.decorator_list
+            ]
         self._parse_docstring()
 
     def _parse_docstring(self):

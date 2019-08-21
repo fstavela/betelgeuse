@@ -699,6 +699,11 @@ def test_run(
     for testcase in testsuite.iterfind('testcase'):
         junit_test_case_id = '{0}.{1}'.format(
             testcase.get('classname'), testcase.get('name'))
+        permutation_value = None
+        if '[' in junit_test_case_id:
+            parts = junit_test_case_id.split('[', 1)
+            junit_test_case_id = parts[0]
+            permutation_value = parts[1].rstrip(']')
         test_case_id = testcases.get(junit_test_case_id)
         if not test_case_id:
             click.echo(
@@ -711,6 +716,11 @@ def test_run(
         element.set('name', 'polarion-testcase-id')
         element.set('value', test_case_id)
         test_properties.append(element)
+        if permutation_value:
+            element = ElementTree.Element('property')
+            element.set('name', 'polarion-parameter-permutation')
+            element.set('value', permutation_value)
+            test_properties.append(element)
         testcase.append(test_properties)
     testsuites.append(testsuite)
 
